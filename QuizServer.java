@@ -36,7 +36,7 @@ public class QuizServer {
             Class.forName("com.mysql.cj.jdbc.Driver");
             Connection connection = DriverManager.getConnection(url, user, password);
             Statement stmt = connection.createStatement();
-            stmt.executeQuery(
+            stmt.executeUpdate(
                     "CREATE TABLE IF NOT EXISTS result ( Name text, Rollno text, TotalQuestions text, RightAnswers text, WrongAnswers text, NotAttempted text, TotalMarks text );");
             PreparedStatement statement = connection.prepareStatement(query, ResultSet.TYPE_SCROLL_INSENSITIVE,
                     ResultSet.CONCUR_READ_ONLY);
