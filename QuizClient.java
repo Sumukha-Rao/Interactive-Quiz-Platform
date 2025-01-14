@@ -75,12 +75,14 @@ public class QuizClient {
 
     static int displayQuestion(Question q, int opShuffled, WithAnswer[] withAnswer, int index) throws Exception {
         System.out.println((index + 1) + "." + "Question: " + q.question);
+        String[] options = { q.op1, q.op2, q.op3, q.op4 };
         if (opShuffled == 0) {
             System.out.println("1. " + q.op1);
             System.out.println("2. " + q.op2);
             System.out.println("3. " + q.op3);
             System.out.println("4. " + q.op4);
-            System.out.println("Your selected : " + withAnswer[index].answer);
+            String selected = withAnswer[index].answer == 0 ? "0" : options[withAnswer[index].answer - 1];
+            System.out.println("Your selected : " + selected);
             System.out.println("0.Skip question 5.Submit answers 6.Prev question 7.Next question");
             System.out.println("Enter your answer:");
             int answer = 0;
@@ -99,7 +101,6 @@ public class QuizClient {
             }
         } else {
             int[] opArray = StaticMethod.ShuffledArray(0, 4);
-            String[] options = { q.op1, q.op2, q.op3, q.op4 };
             for (int i = 0; i < 4; i++) {
                 System.out.println((i + 1) + ". " + options[opArray[i]]);
             }
