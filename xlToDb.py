@@ -13,7 +13,6 @@ def excel_to_mysql(excel_file, db_config, table_name):
     df.to_sql(name=table_name, con=engine, if_exists='replace', index=False)
 path=sys.argv[1]
 excel_file = r"{}".format(path) 
-print(excel_file)
 if is_excel_file(excel_file):
     db_config = {
         'user': 'root',
