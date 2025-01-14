@@ -2,18 +2,19 @@ import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.Scanner;
-import java.io.IOException;
 import pack.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 
 public class QuizServer {
     static Scanner sc = new Scanner(System.in);
@@ -97,17 +98,26 @@ public class QuizServer {
                     break;
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        try (ServerSocket serverSocket = new ServerSocket(12345)) {
-            System.out.println("Server is listening on port 12345...");
+            StartServer server = new StartServer(question, withAnswer, rowCount, qShuffled, opShuffled);
+            server.start();
+            System.out.println("Server started");
+            System.out.println("Press Y to stop the server");
+            int stopServer;
             while (true) {
-                Socket clientSocket = serverSocket.accept();
-                System.out.println("New client connected: " + clientSocket.getInetAddress());
-                new ClientHandler(clientSocket, question, withAnswer, rowCount, qShuffled, opShuffled).start();
+                String s = sc.next();
+                stopServer = StaticMethod.yesOrNo(s);
+                if (stopServer == -1) {
+                    System.out.println("Invalid input. Please enter y or n");
+                    continue;
+                } else {
+                    break;
+                }
             }
-        } catch (IOException e) {
+            if (stopServer == 1) {
+                server.closeServer();
+                System.out.println("Server stopped");
+            }
+        } catch (Exception e) {
             e.printStackTrace();
         }
         sc.close();
@@ -139,6 +149,40 @@ public class QuizServer {
                 break;
             }
         }
+    }
+}
+
+class StartServer extends Thread {
+    Question[] question;
+    WithAnswer[] withAnswer;
+    int rowCount, qShuffled, opShuffled;
+    ServerSocket serverSocket;
+
+    StartServer(Question[] question, WithAnswer[] withAnswer, int rowCount, int qShuffled, int opShuffled) {
+        this.question = question;
+        this.withAnswer = withAnswer;
+        this.rowCount = rowCount;
+        this.qShuffled = qShuffled;
+        this.opShuffled = opShuffled;
+    }
+
+    public void run() {
+        try {
+            serverSocket = new ServerSocket(12345);
+            System.out.println("Server is listening on port 12345...");
+            while (true) {
+                Socket clientSocket = serverSocket.accept();
+                System.out.println("New client connected: " + clientSocket.getInetAddress());
+                new ClientHandler(clientSocket, question, withAnswer, rowCount, qShuffled, opShuffled).start();
+            }
+        } catch (SocketException e) {
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void closeServer() throws Exception {
+        serverSocket.close();
     }
 }
 
